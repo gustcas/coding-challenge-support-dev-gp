@@ -50,16 +50,10 @@ export default function Dashboard() {
       })
 
       if (res.ok) {
-        const updatedTicket = await res.json()
-        
-        // BUG 2 INTENCIONAL: Mutación de estado de React
-        // Se altera el arreglo original en lugar de crear uno nuevo.
-        // Esto causa que React no detecte el cambio y no vuelva a renderizar la UI inmediatamente.
-        const ticketIndex = tickets.findIndex((t) => t.id === updatedTicket.id)
-        if (ticketIndex !== -1) {
-          tickets[ticketIndex] = updatedTicket
-          setTickets(tickets) // React no verá esto como un cambio de estado válido
-        }
+        const updatedTicket = await res.json()        
+        // Resolución Bug prioridad 3: se reemplaza mutación directa del array (tickets[index] = valor)
+        // por map() inmutable para que React detecte el cambio de referencia y re-renderice la UI.
+        setTickets((prev) => prev.map((t) => (t.id === updatedTicket.id ? updatedTicket : t)))
       }
     } catch (error) {
       console.error("Error resolving ticket:", error)
