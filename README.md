@@ -1,33 +1,158 @@
-# Coding Challenge: Soporte TechCorp 🚨
+# 🛠 Coding Challenge – Support Simulation (Polpo)
 
-¡Hola! Gracias por aplicar. Para esta prueba técnica, queremos simular un escenario real de nuestro día a día. No hay requerimientos abstractos, sino un problema real de soporte que debes resolver.
+Este repositorio contiene la solución al challenge de simulación de soporte técnico en producción.
 
-Se evaluará tu capacidad para:
-- Entender código existente (Node.js, React/Next.js, Tailwind).
-- Utilizar herramientas de IA (Claude, Cursor, Gemini, etc.) para acelerar tu diagnóstico y resolución.
-- Priorizar tareas críticas bajo presión.
-- Mantener el orden y las buenas prácticas al corregir bugs.
+El objetivo fue diagnosticar y resolver incidencias reales dentro de una aplicación existente, priorizando según impacto en negocio y aplicando fixes mínimos sin refactorizaciones innecesarias.
 
-## El Contexto
+---
 
-Acabas de iniciar tu día y recibes el siguiente mensaje por Slack de José (Project Manager):
+## 🚀 Stack
 
-> **De:** José
-> **Para:** Equipo de Soporte
-> 
-> "Hola chicos, buenos días. Les paso contexto de unos inconvenientes urgentes que tenemos en la plataforma de TechCorp. Austin (del cliente) me indica que no puede ingresar a resolver los tickets desde su celular, el botón de 'Resolver' simplemente no le hace nada. 
->
-> Además, al parecer están teniendo que recargar toda la página para ver cuando un ticket cambia de estado. Es un tema urgente porque las personas de soporte de ellos no pueden gestionar los casos marcados como 'Urgente', dicen que el sistema se queda cargando y nunca termina. Ya estoy creando los tickets en Jira.
-> 
-> Y por último, y esto es lo más crítico: me acaban de confirmar que un usuario pudo ver los tickets de OTRA empresa. Necesitamos revisar qué está interfiriendo ahí con la base de datos o el servicio, no podemos tener esa fuga de datos.
->
-> Me confirman cuando lo tengan listo para coordinar pruebas finales con ellos. Mil gracias."
+- Next.js 16 (App Router)
+- TypeScript
+- Prisma ORM
+- SQLite (local)
+- Tailwind CSS
 
-## Tu Misión
+---
 
-1. Clona este repositorio e instala las dependencias (`npm install`).
-2. Levanta la base de datos local poblada de prueba (`npm run db:setup`) y el servidor (`npm run dev`).
-3. Identifica y resuelve los 4 problemas mencionados por José en su mensaje.
-4. Sube tu código a un repositorio público (GitHub/GitLab) y envíanos el enlace.
+## ⚙️ Setup
 
-**Nota:** Tienes total libertad de usar herramientas de IA para apoyarte. Lo que nos importa es cómo analizas el problema, cómo guías a la IA y la calidad de la solución final. ¡Éxitos!
+```bash
+npm install
+```
+
+Crear archivo `.env`:
+
+```env
+DATABASE_URL="file:./dev.db"
+```
+
+Inicializar base de datos:
+
+```bash
+npm run db:setup
+```
+
+Ejecutar proyecto:
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧠 Enfoque
+
+El challenge fue abordado como un escenario real de soporte en producción:
+
+- Diagnóstico de causa raíz (no solo síntomas)
+- Priorización por impacto (seguridad → bloqueo → UX → UI)
+- Cambios mínimos (sin refactor innecesario)
+- Aislamiento por ticket (branches `fix/*`)
+
+---
+
+## 🐛 Issues Resueltos
+
+### 🔴 1. Data Leak entre compañías (CRÍTICO)
+
+**Problema:**  
+El endpoint de tickets devolvía información de todas las compañías.
+
+**Impacto:**  
+Fuga de datos entre tenants (riesgo de seguridad alto).
+
+**Solución:**  
+Se filtró la consulta por `companyId` del usuario actual.
+
+---
+
+### 🔴 2. Tickets urgentes se quedan cargando
+
+**Problema:**  
+Al resolver tickets urgentes, la request nunca terminaba.
+
+**Causa raíz:**  
+Promesa async sin `resolve()`.
+
+**Solución:**  
+Se corrigió la función async para que finalice correctamente.
+
+---
+
+### 🟡 3. UI no actualiza estado de tickets
+
+**Problema:**  
+Los cambios solo se veían recargando la página.
+
+**Causa raíz:**  
+Mutación directa del estado en React.
+
+**Solución:**  
+Se implementó actualización inmutable usando `map()`.
+
+---
+
+### 🟢 4. Botón “Resolver” no funciona en mobile
+
+**Problema:**  
+El footer fijo tapaba el botón en mobile.
+
+**Solución:**  
+Se agregó padding inferior al contenedor principal.
+
+---
+
+## 🌿 Estrategia de ramas
+
+```
+main        → base de desarrollo
+production  → versión estable
+fix/*       → una rama por incidente
+```
+
+Ejemplos:
+
+- fix/data-leak-company-scope  
+- fix/urgent-ticket-hanging  
+- fix/react-state-mutation  
+- fix/mobile-footer-overlap  
+
+---
+
+## 🔀 Flujo de trabajo
+
+```
+fix/* → main → production
+```
+
+Cada fix fue:
+
+- aislado  
+- con commit claro  
+- enfocado en un solo problema  
+
+---
+
+## 🧪 Consideraciones
+
+- No se realizaron refactorizaciones globales  
+- Se mantuvo el comportamiento existente fuera de los bugs  
+- Se priorizó estabilidad sobre cambios estructurales  
+
+---
+
+## 📌 Conclusión
+
+Este ejercicio se abordó con mentalidad de soporte en producción, enfocándose en:
+
+- resolución eficiente de incidentes  
+- impacto en usuario final  
+- estabilidad del sistema  
+
+---
+
+## 👤 Autor
+
+Gustavo
