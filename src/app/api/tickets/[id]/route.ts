@@ -3,11 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 // Función auxiliar simulada para envío de correos
 async function sendEmailNotification(ticketId: string, companyId: string) {
-  // BUG 3 INTENCIONAL: Esta promesa nunca se resuelve
-  // El hilo se queda bloqueado esperando.
-  return new Promise((resolve) => {
+  // TODO: reemplazar por integración real con servicio de correo (ej: SendGrid, SES)
+  return new Promise<void>((resolve) => {
     console.log(`Enviando notificación urgente para el ticket ${ticketId}...`)
-    // Falta: resolve() o hay un error de lógica
+    resolve()  // Resolucio prioridad 2  Falta: resolve() o hay un error de lógica
   })
 }
 
@@ -29,7 +28,6 @@ export async function PATCH(
     }
 
     if (ticket.priority === 'Urgente' && status === 'Resuelto') {
-      // Bug 3: Se queda esperando infinitamente
       await sendEmailNotification(ticket.id, ticket.companyId)
     }
 
