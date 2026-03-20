@@ -3,12 +3,12 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    // BUG 4 INTENCIONAL: Fuga de datos
-    // El usuario (simulado) pertenece a 'TechCorp', pero aquí traemos todos los tickets
-    // de la base de datos sin filtrar.
+    // TODO: reemplazar por el companyId real del usuario autenticado (ej: session.user.companyId)
+    // Por ahora se usa un valor simulado como fix mínimo del incidente de fuga de datos.
+    const companyId = 'TechCorp'
     const tickets = await prisma.ticket.findMany({
+      where: { companyId }, // Resolucion: se agrega un filtro por companyId para asegurar que solo se accedan a los tickets de la empresa del usuario autenticado.
       orderBy: { createdAt: 'desc' },
-      // Falta: where: { companyId: 'TechCorp' } o usando el usuario de la sesión
     })
 
     return NextResponse.json(tickets)
